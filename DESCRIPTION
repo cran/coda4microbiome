@@ -1,6 +1,6 @@
 Package: coda4microbiome
 Title: Compositional Data Analysis for Microbiome Studies
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
 	c(
 	person(
@@ -21,16 +21,16 @@ License: MIT + file LICENSE
 URL: https://malucalle.github.io/coda4microbiome/
 BugReports: https://github.com/malucalle/coda4microbiome/issues
 Encoding: UTF-8
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 LazyData: false
-Imports: corrplot, glmnet, plyr, pROC, ggpubr, ggplot2, qpdf
+Imports: corrplot, glmnet, plyr, pROC, ggpubr, ggplot2
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2022-03-31 15:08:14 UTC; Toni
+Packaged: 2022-11-04 12:29:47 UTC; Toni
 Author: Malu Calle [aut] (<https://orcid.org/0000-0001-9334-415X>),
   Toni Susin [aut, cre] (<https://orcid.org/0000-0002-0874-2784>)
 Maintainer: Toni Susin <toni.susin@upc.edu>
 Depends: R (>= 3.5.0)
 Repository: CRAN
-Date/Publication: 2022-03-31 15:30:02 UTC
+Date/Publication: 2022-11-07 08:50:08 UTC

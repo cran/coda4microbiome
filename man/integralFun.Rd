@@ -9,7 +9,7 @@ integralFun(x, y, id, a, b)
 \arguments{
 \item{x}{abundance table in long format (several rows per individual)}
 
-\item{y}{outcome (binary)}
+\item{y}{outcome}
 
 \item{id}{subjects-ids}
 

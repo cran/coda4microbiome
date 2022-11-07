@@ -3,7 +3,7 @@
 #' Integral of the curve trajectory of subject_id in the interval a,b
 #'
 #' @param x abundance table in long format (several rows per individual)
-#' @param y outcome (binary)
+#' @param y outcome
 #' @param id subjects-ids
 #' @param a interval initial time
 #' @param b interval final time
@@ -50,7 +50,7 @@ integralFun <- function(x, y, id, a, b){
 #' of the association of the log-ratio with the outcome where the variables (taxa) are ranked by importance
 #'
 #' @param x abundance table in long format (several rows per individual)
-#' @param y outcome (binary)
+#' @param y outcome
 #' @param x_time observation times
 #' @param subject_id subject id
 #' @param ini_time initial time to be analyzed
@@ -103,19 +103,28 @@ explore_lr_longitudinal<-function(x,y, x_time, subject_id, ini_time, end_time,
   title<-NULL
   X1<-impute_zeros(x)
 
+
   # Data without zeros......
   logX1 = log(X1);
+  subject_id<-as.numeric(as.factor(subject_id))
   nsubjects=length(unique(subject_id)); #num of subjects
 
+  y.binary<-ifelse(dim(table(y))==2, TRUE, FALSE)
 
-  indexUser=c(which(diff(subject_id)>0), length(y));
+  if (y.binary==T) y=factor(y)
+
+  indexUser=seq_along(subject_id)[!duplicated(subject_id)];
   y_unique<-as.numeric(y[indexUser])-1
+
+  if (!is.null(covar)){
+    covar=covar[indexUser,]
+  }
 
   # Compute all the column integrals
   intLogX <-NULL
   for (ki in (1:(ncol(logX1)))){
     print(paste('ind=', ki))
-    yy=logX1[,ki];
+    yy=as.numeric(logX1[,ki]);
     integrals=integralFun(x_time, yy, subject_id, a=ini_time, b=end_time)
     intLogX<-cbind(intLogX, matrix(integrals));
   }
@@ -125,7 +134,7 @@ explore_lr_longitudinal<-function(x,y, x_time, subject_id, ini_time, end_time,
 
   col2<-grDevices::colorRampPalette(GnBu8, space = "Lab")
 
-  y.binary<-ifelse(dim(table(y_unique))==2, TRUE, FALSE)
+
 
   k<-ncol(x)
   if (maxrow>k) maxrow<-k
@@ -158,6 +167,7 @@ explore_lr_longitudinal<-function(x,y, x_time, subject_id, ini_time, end_time,
 
 
   if (y.binary==TRUE){
+    y_unique<-factor(y_unique)
     if (showtitle==TRUE){
           title<-"AUC logistic regression y~Integral(log(xi/xj))"
     }
@@ -211,6 +221,7 @@ explore_lr_longitudinal<-function(x,y, x_time, subject_id, ini_time, end_time,
 
   M<-logratio_cor[o,o]
   colnames(M)<-o
+  rownames(M)<-o
   if (shownames==TRUE) {
     rownames(M)<-colnames(x)[o]
   }
@@ -302,19 +313,35 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
     x<-impute_zeros(x)
   }
   logX1 = log(x);
+  #subject_id<-as.numeric(as.factor(subject_id))
+  #subject_id<-as.numeric(subject_id)
+
   nsubjects=length(unique(subject_id)); #num of subjects
 
 
-  indexUser=c(which(diff(subject_id)>0), length(y));
-  y_unique<-as.numeric(y[indexUser])-1
+  indexUser=seq_along(subject_id)[!duplicated(subject_id)];
 
-  y_unique<-as.factor(y_unique)
+  y_unique<-y[indexUser]
+
+  if (!is.null(covar)){
+    covar=covar[indexUser,]
+  }
+
+
+  y.binary<-ifelse(dim(table(y_unique))==2, TRUE, FALSE)
+
+
+  if (y.binary==TRUE){
+    y<-factor(y)
+    y_unique<-as.factor(y_unique)
+  }
 
   if (is.factor(y)){
     labelsy<-levels(y)
     y_unique<-factor(y_unique, labels=labelsy )
 
   }
+
 
 
   alpha0<-alpha
@@ -328,7 +355,7 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
   intLogX <-NULL
   for (ki in (1:(ncol(logX1)))){
     print(paste('ind=', ki))
-    yy=logX1[,ki];
+    yy=as.numeric(logX1[,ki]);
     integrals=integralFun(x_time, yy, subject_id, a=ini_time, b=end_time)
     intLogX<-cbind(intLogX, matrix(integrals));
   }
@@ -354,11 +381,8 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
   colnames(lrX)<-lrcolnames
 
 
-  idtaxaselect<-intersect(which(idlrX[,1]%in%taxaselect),which(idlrX[,2]%in%taxaselect))
-  idlrXsub<-idlrX[idtaxaselect,]
-  lrXsub<-lrX[,idtaxaselect]
-
-
+  idlrXsub<-idlrX
+  lrXsub<-lrX
 
   y.binary<-ifelse(dim(table(y))==2, TRUE, FALSE)
 
@@ -441,7 +465,7 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
   }
 
   if (y.binary==TRUE){
-    AUC_signature<-pROC::auc(pROC::roc(y_unique, predictions,quiet = TRUE))[[1]]
+    AUC_signature<-pROC::auc(pROC::roc(y_unique, as.numeric(predictions),quiet = TRUE))[[1]]
     if (length(varlogcontrast)==0) AUC_signature<- 0.5
     mcvAUC<-lassocv$cvm[idrow]
     sdcvAUC<-lassocv$cvsd[idrow]
@@ -462,7 +486,7 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
 
   if (showPlots==TRUE){
 
-  plot3<-plot_signature_curves(varlogcontrast,coeflogcontrast, X=x,Y=yini, x_time, subject_id, ini_time, end_time)
+  plot3<-plot_signature_curves(varlogcontrast,coeflogcontrast, x=x,y=yini, x_time, subject_id, ini_time, end_time)
   }
 
   if (y.binary==TRUE){
@@ -531,18 +555,32 @@ coda_glmnet_longitudinal0 <- function(x,lrX,idlrX,nameslrX,y, x_time, subject_id
   # library(glmnet)
   # library(pROC)
 
+  y.binary<-ifelse(dim(table(y))==2, TRUE, FALSE)
 
   if (sum(x==0)>0){
     x<-impute_zeros(x)
   }
   logX1 = log(x);
+  #subject_id<-as.numeric(as.factor(subject_id))
+
   nsubjects=length(unique(subject_id)); #num of subjects
 
 
-  indexUser=c(which(diff(subject_id)>0), length(y));
-  y_unique<-as.numeric(y[indexUser])-1
+  indexUser=seq_along(subject_id)[!duplicated(subject_id)];
 
+  if (!is.null(covar)){
+    covar=covar[indexUser,]
+  }
+
+
+  #y_unique<-as.numeric(y[indexUser])-1
+  y_unique<-y[indexUser]
+
+
+  if (y.binary == TRUE){
+    y<-factor(y)
   y_unique<-as.factor(y_unique)
+  }
 
   if (is.factor(y)){
     labelsy<-levels(y)
@@ -558,7 +596,6 @@ coda_glmnet_longitudinal0 <- function(x,lrX,idlrX,nameslrX,y, x_time, subject_id
   idlrXsub<-idlrX
   lrXsub<-lrX
 
-  y.binary<-ifelse(dim(table(y))==2, TRUE, FALSE)
 
 
   if (y.binary==TRUE){
@@ -634,7 +671,7 @@ coda_glmnet_longitudinal0 <- function(x,lrX,idlrX,nameslrX,y, x_time, subject_id
   }
 
   if (y.binary==TRUE){
-    AUC_signature<-pROC::auc(pROC::roc(y_unique, predictions,quiet = TRUE))[[1]]
+    AUC_signature<-pROC::auc(pROC::roc(y_unique, as.numeric(predictions),quiet = TRUE))[[1]]
     if (length(varlogcontrast)==0) AUC_signature<- 0.5
     mcvAUC<-lassocv$cvm[idrow]
     sdcvAUC<-lassocv$cvsd[idrow]
@@ -731,14 +768,24 @@ coda_glmnet_longitudinal_null<-function(x,y,x_time, subject_id, ini_time, end_ti
   }
   logX1 = log(x);
 
-
+  #subject_id<-as.numeric(as.factor(subject_id))
   nsubjects=length(unique(subject_id)); #num of subjects
 
 
-  indexUser=c(which(diff(subject_id)>0), length(y));
-  y_unique<-as.numeric(y[indexUser])-1
+  indexUser=seq_along(subject_id)[!duplicated(subject_id)];
 
+  if (!is.null(covar)){
+    covar=covar[indexUser,]
+  }
+
+  #y_unique<-as.numeric(y[indexUser])-1
+
+  y_unique<-y[indexUser]
+
+  if (y.binary==TRUE){
+    y<-factor(y)
   y_unique<-as.factor(y_unique)
+  }
 
   if (is.factor(y)){
     labelsy<-levels(y)
@@ -751,7 +798,7 @@ coda_glmnet_longitudinal_null<-function(x,y,x_time, subject_id, ini_time, end_ti
   intLogX <-NULL
   for (ki in (1:(ncol(logX1)))){
     print(paste('ind=', ki))
-    yy=logX1[,ki];
+    yy=as.numeric(logX1[,ki]);
     integrals=integralFun(x_time, yy, subject_id, a=ini_time, b=end_time)
     intLogX<-cbind(intLogX, matrix(integrals));
   }
@@ -808,12 +855,19 @@ coda_glmnet_longitudinal_null<-function(x,y,x_time, subject_id, ini_time, end_ti
 #'
 #' @param varNum column number of the variables (taxa)
 #' @param coeff coefficients (coefficients must sum-up zero)
-#' @param X microbiome abundance matrix in long format
-#' @param Y binary outcome
+#' @param x microbiome abundance matrix in long format
+#' @param y binary outcome
 #' @param x_time observation times
 #' @param subject_id subject id
 #' @param ini_time initial time to be analyzed
 #' @param end_time end time to be analyzed
+#' @param color color graphical parameter
+#' @param showLabel graphical parameter (see help(label))
+#' @param location graphical parameter (see help(label))
+#' @param inset graphical parameter (see help(label))
+#' @param cex graphical parameter (see help(label))
+#' @param y.intersp graphical parameter (see help(label))
+#' @param main_title title plot
 #'
 #' @return trajectories plot
 #'
@@ -838,13 +892,18 @@ coda_glmnet_longitudinal_null<-function(x,y,x_time, subject_id, ini_time, end_ti
 #'                        ini_time=0, end_time=25)
 #'
 #-------------------------------------------------------------------------------
-plot_signature_curves<-function(varNum, coeff, X,Y, x_time, subject_id, ini_time, end_time){
+plot_signature_curves<-function(varNum, coeff, x,y, x_time, subject_id, ini_time, end_time,
+                                color=c("chocolate1","slateblue2"), showLabel=TRUE, location="bottomright", inset=c(0.01,0.02), cex=0.8, y.intersp=0.7, main_title=NULL){
   # library(plyr)
   # suppressWarnings()
-  X1 <- impute_zeros(X)
+  X1 <- impute_zeros(x)
+
+  #subject_id<-as.numeric(as.factor(subject_id))
 
   logX1 = log(X1);
   xref=sort(unique(x_time));
+
+  y.binary<-ifelse(dim(table(y))==2, TRUE, FALSE)
 
   logcontrast=as.matrix(logX1[,varNum])%*%coeff
   # logcontrast<-logcontrast-mean(logcontrast)
@@ -865,20 +924,39 @@ plot_signature_curves<-function(varNum, coeff, X,Y, x_time, subject_id, ini_time
   k1string<-paste(k1, collapse = ',')
   k2string<-paste(k2, collapse = ',')
 
-  plot(x_time,yy, xlim=c(a, b), ylim=c(ymin, ymax), main = paste("Signature",k1string,"vs",k2string), ylab = "", xlab = "time");
-  df<-data.frame(x_time,yy, subject_id,Y)
-  colnames(df)=c("day", "yy", "id","Y")
+  if (is.null(main_title)){
+    main_title<-paste("Signature",k1string,"vs",k2string)
+  }
+
+  if (y.binary==TRUE){
+    y<-factor(y)
+  plot(x_time,yy, xlim=c(a, b), ylim=c(ymin, ymax), main = main_title, ylab = "", xlab = "time");
+    if (showLabel==TRUE){
+      graphics::legend(location, inset=inset,c(levels(as.factor(y))[1],levels(as.factor(y))[2]),
+             col=color,pch=c(1,1), cex = cex, bty="n")
+
+    }
+  } else {
+  plot(x_time,yy, xlim=c(a, b), ylim=c(ymin, ymax), main = main_title, ylab = "", xlab = "time");
+  }
+  df<-data.frame(x_time,yy, subject_id,y)
+  colnames(df)=c("time", "yy", "id","Y")
 
   # colores <- c("orchid","gold1")
-  colores <- c("chocolate1","slateblue2")
+  #colores <- c("chocolate1","slateblue2")
+  colores <- color
   #c("F3AE05","B09EC5")
-  # d_ply(df,"id",function(x) lines(x$day, x$yy, lty=3, col=as.numeric(x$Y)+2))
+  # d_ply(df,"id",function(x) lines(x$time, x$yy, lty=3, col=as.numeric(x$Y)+2))
 
-  plyr::d_ply(df,"id",function(x) graphics::lines(x$day, x$yy, lty=3, col=ifelse(as.numeric(x$Y)==1,colores[1],colores[2])))
+  plyr::d_ply(df,"id",function(x) graphics::lines(x$time, x$yy, lty=3, col=ifelse(as.numeric(x$Y)==1,colores[1],colores[2])))
   n = length(unique(df$id)); #num of curves
 
-  df0 <- subset(df, as.numeric(Y)==min(as.numeric(Y)))
-  xref0 = sort(unique(df0$day));
+  df0<-df
+
+  if (y.binary == TRUE){
+  df0 <- subset(df, as.factor(y)==levels(as.factor(y))[1])
+  }
+  xref0 = sort(unique(df0$time));
   id0 <- unique(df0$id)  # ***
   yref0 = rep(0,length(xref0));
   valors<-NULL
@@ -888,10 +966,10 @@ plot_signature_curves<-function(varNum, coeff, X,Y, x_time, subject_id, ini_time
     # nn=0;
     for (k in id0){  # ***
       curve <- subset(df0, df0$id==k)
-      if (length(curve$day)>0){
-        if ((min(curve$day)<=val) && (max(curve$day)>=val)){
-          if (length(curve$day)>1){
-            pt <- approx(curve$day,curve$yy,val);
+      if (length(curve$time)>0){
+        if ((min(curve$time)<=val) && (max(curve$time)>=val)){
+          if (length(curve$time)>1){
+            pt <- approx(curve$time,curve$yy,val);
             valors=c(valors,pt$y);
           }
         }
@@ -904,10 +982,10 @@ plot_signature_curves<-function(varNum, coeff, X,Y, x_time, subject_id, ini_time
   # lines(xref0, yref0,col=3, pch=19, type="o")
   graphics::lines(xref0, yref0,col=colores[1], pch=19, type="o")
 
-
-  df1<-subset(df, as.numeric(Y)==max(as.numeric(Y)))
+  if (y.binary ==TRUE){
+  df1<-subset(df, as.factor(y)==levels(as.factor(y))[2])
   id1<-unique(df1$id)  # ***
-  xref1=sort(unique(df1$day));
+  xref1=sort(unique(df1$time));
   yref1=rep(0,length(xref1));
   valors<-NULL
   for (i in (1:length(xref1))){
@@ -916,10 +994,10 @@ plot_signature_curves<-function(varNum, coeff, X,Y, x_time, subject_id, ini_time
     nn=0;
     for (k in id1){   #***
       curve <- subset(df1, df1$id==k)
-      if (length(curve$day)>0){
-        if ((min(curve$day)<=val) && (max(curve$day)>=val)){
-          if (length(curve$day)>1){
-            pt <- approx(curve$day,curve$yy,val);
+      if (length(curve$time)>0){
+        if ((min(curve$time)<=val) && (max(curve$time)>=val)){
+          if (length(curve$time)>1){
+            pt <- approx(curve$time,curve$yy,val);
             valors=c(valors, pt$y);
           }
         }
@@ -931,7 +1009,16 @@ plot_signature_curves<-function(varNum, coeff, X,Y, x_time, subject_id, ini_time
   }
   # lines(xref1, yref1, col=4, pch= 19, type="o", lwd=3)
   graphics::lines(xref1, yref1, col=colores[2], pch= 19, type="o", lwd=3)
+  }
   graphics::abline(h=0)
+
+  if (y.binary ==TRUE){
+  if (showLabel==TRUE){
+    graphics::legend(location, inset=inset,c(levels(as.factor(y))[1],levels(as.factor(y))[2]),
+           col=color,pch=c(1,1), cex = cex, bty="o", y.intersp = y.intersp)
+
+  }
+  }
 
   my_plot=grDevices::recordPlot();
   return(my_plot);
@@ -971,6 +1058,9 @@ plotMedianCurve<-function(iNum, iDen, X,Y, x_time, subject_id, ini_time, end_tim
   logX1 = log(X1);
   xref=sort(unique(x_time));
 
+  #subject_id<-as.numeric(as.factor(subject_id))
+
+
   a=ini_time;
   b=end_time;
 
@@ -1003,12 +1093,12 @@ plotMedianCurve<-function(iNum, iDen, X,Y, x_time, subject_id, ini_time, end_tim
 
   plot(x_time,yy, xlim=c(a, b), main = paste("Balance",k1string,"vs",k2string), ylab = "", xlab = "time");
   df<-data.frame(x_time,yy, subject_id,Y)
-  colnames(df)=c("day", "yy", "id","Y")
-  d_ply(df,"id",function(x) graphics::lines(x$day, x$yy, lty=3, col=as.numeric(x$Y)+2))
+  colnames(df)=c("time", "yy", "id","Y")
+  d_ply(df,"id",function(x) graphics::lines(x$time, x$yy, lty=3, col=as.numeric(x$Y)+2))
   n = length(unique(df$id)); #num of curves
 
   df0 <- subset(df, as.numeric(Y)==min(as.numeric(Y)))
-  xref0 = sort(unique(df0$day));
+  xref0 = sort(unique(df0$time));
   id0 <- unique(df0$id)  # ***
   yref0 = rep(0,length(xref0));
   valors<-NULL
@@ -1018,10 +1108,10 @@ plotMedianCurve<-function(iNum, iDen, X,Y, x_time, subject_id, ini_time, end_tim
     # nn=0;
     for (k in id0){  # ***
       curve <- subset(df0, df0$id==k)
-      if (length(curve$day)>0){
-        if ((min(curve$day)<=val) && (max(curve$day)>=val)){
-          if (length(curve$day)>1){
-            pt <- approx(curve$day,curve$yy,val);
+      if (length(curve$time)>0){
+        if ((min(curve$time)<=val) && (max(curve$time)>=val)){
+          if (length(curve$time)>1){
+            pt <- approx(curve$time,curve$yy,val);
             valors=c(valors,pt$y);
           }
         }
@@ -1036,7 +1126,7 @@ plotMedianCurve<-function(iNum, iDen, X,Y, x_time, subject_id, ini_time, end_tim
 
   df1<-subset(df, as.numeric(Y)==max(as.numeric(Y)))
   id1<-unique(df1$id)  # ***
-  xref1=sort(unique(df1$day));
+  xref1=sort(unique(df1$time));
   yref1=rep(0,length(xref1));
   valors<-NULL
   for (i in (1:length(xref1))){
@@ -1045,10 +1135,10 @@ plotMedianCurve<-function(iNum, iDen, X,Y, x_time, subject_id, ini_time, end_tim
     nn=0;
     for (k in id1){   #***
       curve <- subset(df1, df1$id==k)
-      if (length(curve$day)>0){
-        if ((min(curve$day)<=val) && (max(curve$day)>=val)){
-          if (length(curve$day)>1){
-            pt <- approx(curve$day,curve$yy,val);
+      if (length(curve$time)>0){
+        if ((min(curve$time)<=val) && (max(curve$time)>=val)){
+          if (length(curve$time)>1){
+            pt <- approx(curve$time,curve$yy,val);
             valors=c(valors, pt$y);
           }
         }
@@ -1075,7 +1165,7 @@ plotMedianCurve<-function(iNum, iDen, X,Y, x_time, subject_id, ini_time, end_tim
 #' @param taxanames names of different taxa
 #' @param x_time observation times
 #' @param subject_id subject id
-#' @param metadata metadata
+#' @param metadata matrix sample data
 #' @param ini_time initial time to be analyzed
 #' @param end_time end time to be analyzed
 #' @param percent_indv percentage of individuals with more than min_obs observations
@@ -1094,7 +1184,6 @@ plotMedianCurve<-function(iNum, iDen, X,Y, x_time, subject_id, ini_time, end_tim
 #' x=x_ecam # microbiome abundance
 #' x_time = metadata$day_of_life    # observation times
 #' subject_id = metadata$studyid   # subject id
-#' y= metadata$diet           # diet ("bd"= breast diet, "fd"=formula diet)
 #' ini_time = 0
 #' end_time = 360
 #'
@@ -1103,7 +1192,14 @@ plotMedianCurve<-function(iNum, iDen, X,Y, x_time, subject_id, ini_time, end_tim
 #'
 #'
 #-------------------------------------------------------------------------------
-filter_longitudinal<-function(x,taxanames,x_time, subject_id, metadata,ini_time=min(x_time), end_time=max(x_time), percent_indv=0.7, min_obs=3){
+filter_longitudinal<-function(x,taxanames=NULL,x_time, subject_id, metadata,ini_time=min(x_time), end_time=max(x_time), percent_indv=0.7, min_obs=3){
+
+  id1<-names(which(table(subject_id)>=min_obs))
+  index1<-which(subject_id%in%id1)
+  metadata<-metadata[index1,]
+  x<-x[index1,]
+  x_time<-x_time[index1]
+  subject_id<-subject_id[index1]
 
   rownames(metadata)<-NULL
   indtime<-which((x_time>=ini_time)&(x_time<=end_time))
@@ -1131,15 +1227,21 @@ filter_longitudinal<-function(x,taxanames,x_time, subject_id, metadata,ini_time=
     }
   }
 
-  x<-x[indsubject,indtaxa]
+  x<-x0[indsubject,indtaxa]
+  if (!is.null(taxanames)){
   taxanames<-taxanames[indtaxa]
+  } else {
+    taxanames<-colnames(x)
+  }
   metadata<-metadata0[indsubject,]
 
   #save(x,taxanames, metadata, file="data_filtered.RData")
 
   results <- list(
     "filtered abundance matrix" = x,
+
     "filtered taxa names" = taxanames,
+
     "filtered metadata" = metadata
   )
 

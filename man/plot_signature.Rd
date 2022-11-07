@@ -4,7 +4,7 @@
 \alias{plot_signature}
 \title{plot_signature}
 \usage{
-plot_signature(vars, coeff, showPlots = TRUE)
+plot_signature(vars, coeff, showPlots = TRUE, varnames = NULL)
 }
 \arguments{
 \item{vars}{variables selected}
@@ -12,6 +12,8 @@ plot_signature(vars, coeff, showPlots = TRUE)
 \item{coeff}{associated coefficients}
 
 \item{showPlots}{if TRUE, shows the plots (default = TRUE)}
+
+\item{varnames}{if TRUE, shows the names of the variables}
 }
 \value{
 bar plot

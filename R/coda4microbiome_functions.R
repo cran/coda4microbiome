@@ -137,11 +137,12 @@ explore_zeros<-function(x,id1,id2,strata=NULL){
 #'
 #-------------------------------------------------------------------------------
 impute_zeros<-function(x){
-  if (min(x)< 0) {
+  if (min(as.numeric(unlist(x)))< 0) {
     stop("Negative abundance values (check your data)")
   } else {
     if (sum(x==0)>0){
-      xmin = min(x[x > 0]);
+      #xmin = min(x[x > 0]);
+      xmin = min(as.numeric(unlist(x))[as.numeric(unlist(x))>0])
       if (xmin >= 1){
         x = x + 1;
       }else{
@@ -354,7 +355,7 @@ explore_logratios<-function(x,y,decreasing=TRUE, measure="AUC", covar=NULL, show
             model1<-glm(y~., family = "binomial", data=df)
           }
           if (requireNamespace("pROC", quietly = TRUE)) {
-            logratio_cor[i,j]<-pROC::auc(pROC::roc(y, predict(model1),quiet = TRUE))[[1]]
+            logratio_cor[i,j]<-pROC::auc(pROC::roc(y, as.numeric(predict(model1)),quiet = TRUE))[[1]]
           } else {
             stop("pROC package not loaded")
           }
@@ -569,7 +570,7 @@ coda_glmnet<-function(x,y, covar=NULL, lambda="lambda.1se",nvar=NULL,alpha=0.9, 
   }
 
   if (y.binary==TRUE){
-    AUC_signature<-pROC::auc(pROC::roc(y, predictions,quiet = TRUE))[[1]]
+    AUC_signature<-pROC::auc(pROC::roc(y, as.numeric(predictions),quiet = TRUE))[[1]]
     if (length(varlogcontrast)==0) AUC_signature<- 0.5
     mcvAUC<-lassocv$cvm[idrow]
     sdcvAUC<-lassocv$cvsd[idrow]
@@ -730,6 +731,7 @@ plot_prediction <- function(prediction, y, strata=NULL, showPlots=TRUE){
 #' @param vars variables selected
 #' @param coeff associated coefficients
 #' @param showPlots if TRUE, shows the plots (default = TRUE)
+#' @param varnames if TRUE, shows the names of the variables
 #'
 #' @return bar plot
 #'
@@ -747,7 +749,7 @@ plot_prediction <- function(prediction, y, strata=NULL, showPlots=TRUE){
 #'
 #'
 #-------------------------------------------------------------------------------
-plot_signature <- function(vars, coeff, showPlots=TRUE){
+plot_signature <- function(vars, coeff, showPlots=TRUE, varnames=NULL){
 
   # library(ggpubr)
 
@@ -758,6 +760,11 @@ plot_signature <- function(vars, coeff, showPlots=TRUE){
 
 
   df<-data.frame(vars,coeff=round(coeff,digits = 2), positive)
+
+  if (!is.null(varnames)){
+    df$vars<-varnames
+  }
+
 
   L<-ggpubr::ggbarplot(df, x = "vars", y = "coeff", color="positive",fill="positive",
                sort.val="asc",  orientation = "horiz",position = ggplot2::position_dodge(),
@@ -888,7 +895,7 @@ coda_glmnet0<-function(x,lrX,idlrX,nameslrX,y, covar=NULL, lambda="lambda.1se",a
   }
 
   if (y.binary==TRUE){
-    AUC_signature<-pROC::auc(pROC::roc(y, predictions,quiet = TRUE))[[1]]
+    AUC_signature<-pROC::auc(pROC::roc(y, as.numeric(predictions),quiet = TRUE))[[1]]
     if (length(varlogcontrast)==0) AUC_signature<- 0.5
     mcvAUC<-lassocv$cvm[idrow]
     sdcvAUC<-lassocv$cvsd[idrow]

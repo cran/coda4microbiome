@@ -24,7 +24,7 @@ explore_lr_longitudinal(
 \arguments{
 \item{x}{abundance table in long format (several rows per individual)}
 
-\item{y}{outcome (binary)}
+\item{y}{outcome}
 
 \item{x_time}{observation times}
 

@@ -7,12 +7,19 @@
 plot_signature_curves(
   varNum,
   coeff,
-  X,
-  Y,
+  x,
+  y,
   x_time,
   subject_id,
   ini_time,
-  end_time
+  end_time,
+  color = c("chocolate1", "slateblue2"),
+  showLabel = TRUE,
+  location = "bottomright",
+  inset = c(0.01, 0.02),
+  cex = 0.8,
+  y.intersp = 0.7,
+  main_title = NULL
 )
 }
 \arguments{
@@ -20,9 +27,9 @@ plot_signature_curves(
 
 \item{coeff}{coefficients (coefficients must sum-up zero)}
 
-\item{X}{microbiome abundance matrix in long format}
+\item{x}{microbiome abundance matrix in long format}
 
-\item{Y}{binary outcome}
+\item{y}{binary outcome}
 
 \item{x_time}{observation times}
 
@@ -31,6 +38,20 @@ plot_signature_curves(
 \item{ini_time}{initial time to be analyzed}
 
 \item{end_time}{end time to be analyzed}
+
+\item{color}{color graphical parameter}
+
+\item{showLabel}{graphical parameter (see help(label))}
+
+\item{location}{graphical parameter (see help(label))}
+
+\item{inset}{graphical parameter (see help(label))}
+
+\item{cex}{graphical parameter (see help(label))}
+
+\item{y.intersp}{graphical parameter (see help(label))}
+
+\item{main_title}{title plot}
 }
 \value{
 trajectories plot

@@ -6,7 +6,7 @@
 \usage{
 filter_longitudinal(
   x,
-  taxanames,
+  taxanames = NULL,
   x_time,
   subject_id,
   metadata,
@@ -25,7 +25,7 @@ filter_longitudinal(
 
 \item{subject_id}{subject id}
 
-\item{metadata}{metadata}
+\item{metadata}{matrix sample data}
 
 \item{ini_time}{initial time to be analyzed}
 
@@ -48,7 +48,6 @@ data(ecam_filtered, package = "coda4microbiome")   # load the data
 x=x_ecam # microbiome abundance
 x_time = metadata$day_of_life    # observation times
 subject_id = metadata$studyid   # subject id
-y= metadata$diet           # diet ("bd"= breast diet, "fd"=formula diet)
 ini_time = 0
 end_time = 360
 
