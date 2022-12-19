@@ -18,9 +18,9 @@ explore_logratios(
 )
 }
 \arguments{
-\item{x}{abundance table (rows are samples, columns are variables (taxa))}
+\item{x}{abundance matrix or data frame (rows are samples, columns are variables (taxa))}
 
-\item{y}{outcome (binary or continuous)}
+\item{y}{outcome (binary or continuous); data type: numeric, character or factor vector}
 
 \item{decreasing}{order of importance (default = TRUE)}
 

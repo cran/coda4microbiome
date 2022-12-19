@@ -5,7 +5,7 @@
 #' Results can be stratified by a categorical variable.
 #'
 #'
-#' @param x abundance table (rows are samples, columns are variables (taxa))
+#' @param x abundance matrix or data frame (rows are samples, columns are variables (taxa))
 #' @param id1 column number in x for the first taxa
 #' @param id2 column number in x for the second taxa
 #' @param strata stratification variable (default = NULL)
@@ -121,9 +121,9 @@ explore_zeros<-function(x,id1,id2,strata=NULL){
 #' it adds half of the minimum value of the table, otherwise.
 #'
 #'
-#' @param x abundance table (rows are samples, columns are variables (taxa))
+#' @param x abundance matrix or data frame (rows are samples, columns are variables (taxa))
 #'
-#' @return x abundance table with zeros substituted by imputed positive values
+#' @return x abundance matrix or data frame with zeros substituted by imputed positive values
 #'
 #' @export
 #' @author M. Calle - T. Susin
@@ -158,7 +158,7 @@ impute_zeros<-function(x){
 #'
 #' Computes a large matrix with all the log-ratios between pairs of taxa (columns) in the abundance table
 #'
-#' @param x abundance table  (rows are samples, columns are variables (taxa))
+#' @param x abundance matrix or data frame  (rows are samples, columns are variables (taxa))
 #'
 #' @return list with matrix of log-ratios, matrix indicating the pairs of variables involved in each log-ratio,
 #' and a matrix indicating the names of the variables involved in each log-ratio.
@@ -230,8 +230,8 @@ logratios_matrix<-function(x){
 #' the association measures of those log-ratios involving the variable. The output includes a plot
 #' of the association of the log-ratio with the outcome where the variables (taxa) are ranked by importance
 #'
-#' @param x abundance table (rows are samples, columns are variables (taxa))
-#' @param y outcome (binary or continuous)
+#' @param x abundance matrix or data frame (rows are samples, columns are variables (taxa))
+#' @param y outcome (binary or continuous); data type: numeric, character or factor vector
 #' @param decreasing order of importance (default = TRUE)
 #' @param measure association measures "AUC", "Pearson","Spearman", "glm" (default = "AUC")
 #' @param covar data frame with covariates (default = NULL)
@@ -440,14 +440,15 @@ explore_logratios<-function(x,y,decreasing=TRUE, measure="AUC", covar=NULL, show
 #' The result is expressed as the (weighted) balance between two groups of taxa.
 #' It allows the use of non-compositional covariates.
 #'
-#' @param x abundance table (rows are samples, columns are variables (taxa))
-#' @param y outcome (binary or continuous)
+#' @param x abundance matrix or data frame (rows are samples, columns are variables (taxa))
+#' @param y outcome (binary or continuous); data type: numeric, character or factor vector
 #' @param covar data frame with covariates (default = NULL)
 #' @param lambda penalization parameter (default = "lambda.1se")
 #' @param nvar number of variables to use in the glmnet.fit function (default = NULL)
 #' @param alpha elastic net parameter (default = 0.9)
 #' @param nfolds number of folds
 #' @param showPlots if TRUE, shows the plots (default = TRUE)
+#' @param coef_threshold coefficient threshold, minimum absolute value of the coefficient for a variable to be included in the model (default =0)
 #'
 #' @return if y is binary: list with "taxa.num","taxa.name","log-contrast coefficients","predictions","apparent AUC","mean cv-AUC","sd cv-AUC","predictions plot","signature plot"
 #' if not:list with "taxa.num","taxa.name","log-contrast coefficients","predictions","apparent Rsq","mean cv-MSE","sd cv-MSE","predictions plot","signature plot"
@@ -470,7 +471,7 @@ explore_logratios<-function(x,y,decreasing=TRUE, measure="AUC", covar=NULL, show
 #'
 #'
 #-------------------------------------------------------------------------------
-coda_glmnet<-function(x,y, covar=NULL, lambda="lambda.1se",nvar=NULL,alpha=0.9, nfolds=10,showPlots= TRUE){
+coda_glmnet<-function(x,y, covar=NULL, lambda="lambda.1se",nvar=NULL,alpha=0.9, nfolds=10,showPlots= TRUE, coef_threshold=0){
 
   # library(glmnet)
   # library(pROC)
@@ -539,7 +540,8 @@ coda_glmnet<-function(x,y, covar=NULL, lambda="lambda.1se",nvar=NULL,alpha=0.9, 
   }
 
   coeflogcontrast<-2*coeflogcontrast/sum(abs(coeflogcontrast))
-  varlogcontrast<-which(abs(coeflogcontrast)>0)
+  #varlogcontrast<-which(abs(coeflogcontrast)>0)
+  varlogcontrast<-which(abs(coeflogcontrast)>coef_threshold)
   coeflogcontrast<-coeflogcontrast[varlogcontrast]
 
   (names.select<-colnames(x)[varlogcontrast])
@@ -619,7 +621,7 @@ coda_glmnet<-function(x,y, covar=NULL, lambda="lambda.1se",nvar=NULL,alpha=0.9, 
 #' Multiple box-plot and density plots for binary outcomes and Regression plot for continuous outcome
 #'
 #' @param prediction the fitted values of predictions for the model
-#' @param y outcome (binary or continuous)
+#' @param y outcome (binary or continuous); data type: numeric, character or factor vector
 #' @param strata stratification variable (default = NULL)
 #' @param showPlots if TRUE, shows the plots (default = TRUE)
 #'
@@ -650,6 +652,8 @@ plot_prediction <- function(prediction, y, strata=NULL, showPlots=TRUE){
 
   y.binary<-ifelse(dim(table(y))==2, TRUE, FALSE)
 
+ # if (y.binary == TRUE) {y<-factor(y)}
+
   if (is.null(strata)){
     data <- data.frame(prediction,y)
     nameX <- as.character(substitute(prediction))
@@ -669,7 +673,7 @@ plot_prediction <- function(prediction, y, strata=NULL, showPlots=TRUE){
 
     pdens <- ggpubr::ggdensity(data, x=nameX,
                        add = "mean", rug = FALSE,
-                       color = nameY, fill = nameY,
+                       color = nameY, fill = factor(nameY),
                        palette = c(colores[1], colores[2])
                        # palette ="PuOr"
     )
@@ -937,8 +941,8 @@ coda_glmnet0<-function(x,lrX,idlrX,nameslrX,y, covar=NULL, lambda="lambda.1se",a
 #' It provides the distribution of results under the null hypothesis by
 #' implementing the coda_glmnet() on different rearrangements of the response variable.
 #'
-#' @param x abundance table (rows are samples, columns are variables (taxa))
-#' @param y outcome (binary or continuous)
+#' @param x abundance matrix or data frame (rows are samples, columns are variables (taxa))
+#' @param y outcome (binary or continuous); data type: numeric, character or factor vector
 #' @param niter number of iterations (default = 100)
 #' @param covar data frame with covariates (default = NULL)
 #' @param lambda penalization parameter (default = "lambda.1se")

@@ -9,7 +9,7 @@ plot_prediction(prediction, y, strata = NULL, showPlots = TRUE)
 \arguments{
 \item{prediction}{the fitted values of predictions for the model}
 
-\item{y}{outcome (binary or continuous)}
+\item{y}{outcome (binary or continuous); data type: numeric, character or factor vector}
 
 \item{strata}{stratification variable (default = NULL)}
 

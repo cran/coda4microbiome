@@ -2,8 +2,8 @@
 #'
 #' Integral of the curve trajectory of subject_id in the interval a,b
 #'
-#' @param x abundance table in long format (several rows per individual)
-#' @param y outcome
+#' @param x abundance matrix or data frame in long format (several rows per individual)
+#' @param y outcome (binary); data type: numeric, character or factor vector
 #' @param id subjects-ids
 #' @param a interval initial time
 #' @param b interval final time
@@ -49,8 +49,8 @@ integralFun <- function(x, y, id, a, b){
 #' the association measures of those log-ratios involving the variable. The output includes a plot
 #' of the association of the log-ratio with the outcome where the variables (taxa) are ranked by importance
 #'
-#' @param x abundance table in long format (several rows per individual)
-#' @param y outcome
+#' @param x abundance matrix or data frame in long format (several rows per individual)
+#' @param y outcome (binary); data type: numeric, character or factor vector
 #' @param x_time observation times
 #' @param subject_id subject id
 #' @param ini_time initial time to be analyzed
@@ -264,8 +264,8 @@ explore_lr_longitudinal<-function(x,y, x_time, subject_id, ini_time, end_time,
 #' The algorithm performs variable selection through penalized regression over the summary of the log-ratio trajectories (AUC).
 #' The result is expressed as the (weighted) balance between two groups of taxa.
 #'
-#' @param x abundance table in long format (several rows per individual)
-#' @param y outcome (binary)
+#' @param x abundance matrix or data frame in long format (several rows per individual)
+#' @param y outcome (binary); data type: numeric, character or factor vector
 #' @param x_time observation times
 #' @param subject_id subject id
 #' @param ini_time initial time to be analyzed
@@ -274,8 +274,9 @@ explore_lr_longitudinal<-function(x,y, x_time, subject_id, ini_time, end_time,
 #' @param lambda penalization parameter (default = "lambda.1se")
 #' @param nvar number of variables to use in the glmnet.fit function (default = NULL)
 #' @param alpha elastic net parameter (default = 0.9)
-#' @param nfolds number of folds
+#' @param nfolds number of folds (default = 10)
 #' @param showPlots if TRUE, shows the plots (default = FALSE)
+#' @param coef_threshold coefficient threshold, minimum absolute value of the coefficient for a variable to be included in the model (default =0)
 #'
 #'
 #' @return in case of binary outcome: list with "taxa.num","taxa.name","log-contrast coefficients","predictions","apparent AUC","mean cv-AUC","sd cv-AUC","predictions plot","signature plot","trajectories plot"
@@ -301,7 +302,7 @@ explore_lr_longitudinal<-function(x,y, x_time, subject_id, ini_time, end_time,
 #'
 #-------------------------------------------------------------------------------
 coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time,
-                                   covar=NULL, lambda="lambda.1se",nvar=NULL,alpha=0.9,nfolds=10, showPlots=TRUE){
+                                   covar=NULL, lambda="lambda.1se",nvar=NULL,alpha=0.9,nfolds=10, showPlots=TRUE, coef_threshold=0){
   #suppressWarnings()
 
   # library(glmnet)
@@ -435,8 +436,9 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
   }
 
   coeflogcontrast<-2*coeflogcontrast/sum(abs(coeflogcontrast))
-  varlogcontrast<-which(abs(coeflogcontrast)>0)
-  coeflogcontrast<-coeflogcontrast[varlogcontrast]
+  #varlogcontrast<-which(abs(coeflogcontrast)>0)
+  varlogcontrast<-which(abs(coeflogcontrast)>coef_threshold)
+    coeflogcontrast<-coeflogcontrast[varlogcontrast]
 
   (names.select<-colnames(x)[varlogcontrast])
 
@@ -522,11 +524,11 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
 #'
 #' internal function
 #'
-#' @param x abundance table in long format (several rows per individual)
+#' @param x abundance matrix or data frame in long format (several rows per individual)
 #' @param lrX log-ratio matrix
 #' @param idlrX indices table in the log-ratio matrix
 #' @param nameslrX colnames of the log-ratio matrix
-#' @param y outcome (binary)
+#' @param y outcome (binary); data type: numeric, character or factor vector
 #' @param x_time observation times
 #' @param subject_id subject id
 #' @param ini_time initial time to be analyzed
@@ -717,8 +719,8 @@ coda_glmnet_longitudinal0 <- function(x,lrX,idlrX,nameslrX,y, x_time, subject_id
 #' implementing the coda_glmnet_longitudinal() on different rearrangements of the response variable.
 
 #'
-#' @param x abundance table in long format (several rows per individual)
-#' @param y outcome (binary)
+#' @param x abundance matrix or data frame in long format (several rows per individual)
+#' @param y outcome (binary); data type: numeric, character or factor vector
 #' @param x_time observation times
 #' @param subject_id subject id
 #' @param ini_time initial time to be analyzed
@@ -856,7 +858,7 @@ coda_glmnet_longitudinal_null<-function(x,y,x_time, subject_id, ini_time, end_ti
 #' @param varNum column number of the variables (taxa)
 #' @param coeff coefficients (coefficients must sum-up zero)
 #' @param x microbiome abundance matrix in long format
-#' @param y binary outcome
+#' @param y binary outcome; data type: numeric, character or factor vector
 #' @param x_time observation times
 #' @param subject_id subject id
 #' @param ini_time initial time to be analyzed
@@ -1161,7 +1163,7 @@ plotMedianCurve<-function(iNum, iDen, X,Y, x_time, subject_id, ini_time, end_tim
 #'
 #' Filters those individuals and taxa with enough longitudinal information
 #'
-#' @param x abundance table in long format (several rows per individual)
+#' @param x abundance matrix or data frame in long format (several rows per individual)
 #' @param taxanames names of different taxa
 #' @param x_time observation times
 #' @param subject_id subject id

@@ -17,7 +17,7 @@ filter_longitudinal(
 )
 }
 \arguments{
-\item{x}{abundance table in long format (several rows per individual)}
+\item{x}{abundance matrix or data frame in long format (several rows per individual)}
 
 \item{taxanames}{names of different taxa}
 

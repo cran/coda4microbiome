@@ -7,10 +7,10 @@
 impute_zeros(x)
 }
 \arguments{
-\item{x}{abundance table (rows are samples, columns are variables (taxa))}
+\item{x}{abundance matrix or data frame (rows are samples, columns are variables (taxa))}
 }
 \value{
-x abundance table with zeros substituted by imputed positive values
+x abundance matrix or data frame with zeros substituted by imputed positive values
 }
 \description{
 Simple imputation: When the abundance table contains zeros, a positive value is added

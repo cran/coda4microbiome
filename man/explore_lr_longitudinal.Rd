@@ -22,9 +22,9 @@ explore_lr_longitudinal(
 )
 }
 \arguments{
-\item{x}{abundance table in long format (several rows per individual)}
+\item{x}{abundance matrix or data frame in long format (several rows per individual)}
 
-\item{y}{outcome}
+\item{y}{outcome (binary); data type: numeric, character or factor vector}
 
 \item{x_time}{observation times}
 

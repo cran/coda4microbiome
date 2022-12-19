@@ -20,9 +20,9 @@ coda_glmnet_longitudinal_null(
 )
 }
 \arguments{
-\item{x}{abundance table in long format (several rows per individual)}
+\item{x}{abundance matrix or data frame in long format (several rows per individual)}
 
-\item{y}{outcome (binary)}
+\item{y}{outcome (binary); data type: numeric, character or factor vector}
 
 \item{x_time}{observation times}
 

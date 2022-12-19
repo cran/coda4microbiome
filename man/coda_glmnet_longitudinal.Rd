@@ -16,13 +16,14 @@ coda_glmnet_longitudinal(
   nvar = NULL,
   alpha = 0.9,
   nfolds = 10,
-  showPlots = TRUE
+  showPlots = TRUE,
+  coef_threshold = 0
 )
 }
 \arguments{
-\item{x}{abundance table in long format (several rows per individual)}
+\item{x}{abundance matrix or data frame in long format (several rows per individual)}
 
-\item{y}{outcome (binary)}
+\item{y}{outcome (binary); data type: numeric, character or factor vector}
 
 \item{x_time}{observation times}
 
@@ -40,9 +41,11 @@ coda_glmnet_longitudinal(
 
 \item{alpha}{elastic net parameter (default = 0.9)}
 
-\item{nfolds}{number of folds}
+\item{nfolds}{number of folds (default = 10)}
 
 \item{showPlots}{if TRUE, shows the plots (default = FALSE)}
+
+\item{coef_threshold}{coefficient threshold, minimum absolute value of the coefficient for a variable to be included in the model (default =0)}
 }
 \value{
 in case of binary outcome: list with "taxa.num","taxa.name","log-contrast coefficients","predictions","apparent AUC","mean cv-AUC","sd cv-AUC","predictions plot","signature plot","trajectories plot"

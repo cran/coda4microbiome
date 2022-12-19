@@ -29,7 +29,7 @@ plot_signature_curves(
 
 \item{x}{microbiome abundance matrix in long format}
 
-\item{y}{binary outcome}
+\item{y}{binary outcome; data type: numeric, character or factor vector}
 
 \item{x_time}{observation times}
 

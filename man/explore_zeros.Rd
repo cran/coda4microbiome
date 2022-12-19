@@ -7,7 +7,7 @@
 explore_zeros(x, id1, id2, strata = NULL)
 }
 \arguments{
-\item{x}{abundance table (rows are samples, columns are variables (taxa))}
+\item{x}{abundance matrix or data frame (rows are samples, columns are variables (taxa))}
 
 \item{id1}{column number in x for the first taxa}
 

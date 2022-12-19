@@ -22,7 +22,7 @@ coda_glmnet_longitudinal0(
 )
 }
 \arguments{
-\item{x}{abundance table in long format (several rows per individual)}
+\item{x}{abundance matrix or data frame in long format (several rows per individual)}
 
 \item{lrX}{log-ratio matrix}
 
@@ -30,7 +30,7 @@ coda_glmnet_longitudinal0(
 
 \item{nameslrX}{colnames of the log-ratio matrix}
 
-\item{y}{outcome (binary)}
+\item{y}{outcome (binary); data type: numeric, character or factor vector}
 
 \item{x_time}{observation times}
 

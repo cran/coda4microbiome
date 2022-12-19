@@ -12,13 +12,14 @@ coda_glmnet(
   nvar = NULL,
   alpha = 0.9,
   nfolds = 10,
-  showPlots = TRUE
+  showPlots = TRUE,
+  coef_threshold = 0
 )
 }
 \arguments{
-\item{x}{abundance table (rows are samples, columns are variables (taxa))}
+\item{x}{abundance matrix or data frame (rows are samples, columns are variables (taxa))}
 
-\item{y}{outcome (binary or continuous)}
+\item{y}{outcome (binary or continuous); data type: numeric, character or factor vector}
 
 \item{covar}{data frame with covariates (default = NULL)}
 
@@ -31,6 +32,8 @@ coda_glmnet(
 \item{nfolds}{number of folds}
 
 \item{showPlots}{if TRUE, shows the plots (default = TRUE)}
+
+\item{coef_threshold}{coefficient threshold, minimum absolute value of the coefficient for a variable to be included in the model (default =0)}
 }
 \value{
 if y is binary: list with "taxa.num","taxa.name","log-contrast coefficients","predictions","apparent AUC","mean cv-AUC","sd cv-AUC","predictions plot","signature plot"

@@ -7,7 +7,7 @@
 logratios_matrix(x)
 }
 \arguments{
-\item{x}{abundance table  (rows are samples, columns are variables (taxa))}
+\item{x}{abundance matrix or data frame  (rows are samples, columns are variables (taxa))}
 }
 \value{
 list with matrix of log-ratios, matrix indicating the pairs of variables involved in each log-ratio,

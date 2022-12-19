@@ -66,7 +66,7 @@ The interpretability of results is of major importance in this context. The pack
 
     The algorithm performs variable selection through penalized regression on the set of all pairwise log-ratios for both, binary outcome (logistic regression) and continuous outcome (linear regression). The result is expressed as the (weighted) balance between two groups of taxa. It allows the use of non-compositional covariates.
     
-    A graphical representation of the taxa that constitutes the signature and their coefficients is provided. The output also includes a plot of the prediction or classification accuracy. 
+    A graphical representation of the taxa that constitutes the signature and their coefficients is provided as an element of the output. The output also includes a plot of the prediction or classification accuracy. 
 
 * **coda_glmnet_longitudinal**: Identification of microbial signatures in longitudinal studies.
 
