@@ -673,7 +673,7 @@ plot_prediction <- function(prediction, y, strata=NULL, showPlots=TRUE){
 
     pdens <- ggpubr::ggdensity(data, x=nameX,
                        add = "mean", rug = FALSE,
-                       color = nameY, fill = factor(nameY),
+                       color = nameY, fill = nameY,
                        palette = c(colores[1], colores[2])
                        # palette ="PuOr"
     )
@@ -763,14 +763,14 @@ plot_signature <- function(vars, coeff, showPlots=TRUE, varnames=NULL){
   positive<-factor(positive, levels = c(0,1), labels = c("negative","positive"))
 
 
-  df<-data.frame(vars,coeff=round(coeff,digits = 2), positive)
+  df<-data.frame(vars,coeff=round(coeff,digits = 2), sign=positive)
 
   if (!is.null(varnames)){
     df$vars<-varnames
   }
 
 
-  L<-ggpubr::ggbarplot(df, x = "vars", y = "coeff", color="positive",fill="positive",
+  L<-ggpubr::ggbarplot(df, x = "vars", y = "coeff", color="sign",fill="sign",
                sort.val="asc",  orientation = "horiz",position = ggplot2::position_dodge(),
                label = TRUE, lab.vjust=0.2, lab.hjust=0.5,ylab=FALSE)
 

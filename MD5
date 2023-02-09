@@ -1,12 +1,12 @@
-d32cb767c5bf3b103ac7a458b1396822 *DESCRIPTION
+dfaf13d37b433d5d81ebe201e6ee03af *DESCRIPTION
 362fc53b4ef90f30df889a22b651bec1 *LICENSE
 60d6ca3f9c6acdc84d8925930798f658 *NAMESPACE
 602529dcb932de741c62326147fc46b9 *R/coda4microbiome.R
 d9bacbc3ce5a34efe297202d9b4b0c7c *R/coda4microbiome_data.R
-5a9b8a5a9d4e4a718d750449eb36d7d4 *R/coda4microbiome_functions.R
+3287c6db3a60e08975336f130c98d9e3 *R/coda4microbiome_functions.R
 f54575aec9e015311e25b73ab6b2bf30 *R/coda4microbiome_longitudinal_functions.R
-ab8c77be1e52cd4cb4ba119fb3815128 *build/partial.rdb
-177aaa1e99ed67d00134368f17aae64b *build/vignette.rds
+cb4924f3573383fca290a0a8e2ca5294 *build/partial.rdb
+128c896c95aa003b3fc621b08a1a30f1 *build/vignette.rds
 824df1922f574b6cb112621dd6a056d6 *data/Crohn.rda
 db1f20dff474e2914d3b7fbe4d2a702d *data/HIV.rda
 85ebf5ba5da5e1455f6545b9eec4ac13 *data/ecam_filtered.rda
