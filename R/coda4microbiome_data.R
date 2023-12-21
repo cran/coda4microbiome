@@ -172,6 +172,62 @@ NULL
 #' @keywords data
 NULL
 
+#' data_survival
+#'
+#' Survival Data simulated from the Crohn's disease original study: 48 taxa and 150 individuals
+#'
+#'
+#'
+#' @format The dataset contains three objects:
+#' \describe{
+#'   \item{x}{microbiome abundance matrix for 150 individuals (rows) and 48 genera (columns)}
+#'   \item{Event}{a \code{numeric}, event occurrence. Vector (type: numeric or logical) specifying 0 or FALSE for no event occurrence, and 1 or TRUE for event occurrence.}
+#'   \item{Event_time}{a \code{numeric}, time to event or follow up time for right censored data. Must be a vector (type:numeric) specifying time to event for each sample for right censored data.}
+#' }
+#' @name x
+#' @docType data
+#' @references \doi{10.1016/j.chom.2014.02.005}
+#' @keywords data
+NULL
+
+
+#' data_survival
+#'
+#' Survival Data simulated from the Crohn's disease original study: 48 taxa and 150 individuals
+#'
+#'
+#'
+#' @format The dataset contains three objects:
+#' \describe{
+#'   \item{x}{microbiome abundance matrix for 150 individuals (rows) and 48 genera (columns)}
+#'   \item{Event}{a \code{numeric}, event occurrence. Vector (type: numeric or logical) specifying 0 or FALSE for no event occurrence, and 1 or TRUE for event occurrence.}
+#'   \item{Event_time}{a \code{numeric}, time to event or follow up time for right censored data. Must be a vector (type:numeric) specifying time to event for each sample for right censored data.}
+#' }
+#' @name Event
+#' @docType data
+#' @references \doi{10.1016/j.chom.2014.02.005}
+#' @keywords data
+NULL
+
+#' data_survival
+#'
+#' Survival Data simulated from the Crohn's disease original study: 48 taxa and 150 individuals
+#'
+#'
+#'
+#' @format The dataset contains three objects:
+#' \describe{
+#'   \item{x}{microbiome abundance matrix for 150 individuals (rows) and 48 genera (columns)}
+#'   \item{Event}{a \code{numeric}, event occurrence. Vector (type: numeric or logical) specifying 0 or FALSE for no event occurrence, and 1 or TRUE for event occurrence.}
+#'   \item{Event_time}{a \code{numeric}, time to event or follow up time for right censored data. Must be a vector (type:numeric) specifying time to event for each sample for right censored data.}
+#' }
+#' @name Event_time
+#' @docType data
+#' @references \doi{10.1016/j.chom.2014.02.005}
+#' @keywords data
+NULL
+
+
 
 #' ecam_filtered
 #'

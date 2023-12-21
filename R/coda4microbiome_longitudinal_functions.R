@@ -435,7 +435,7 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
     coeflogcontrast[idlrXsub[i,2]]<-coeflogcontrast[idlrXsub[i,2]]-coeflr[i]
   }
 
-  coeflogcontrast<-2*coeflogcontrast/sum(abs(coeflogcontrast))
+  #coeflogcontrast<-2*coeflogcontrast/sum(abs(coeflogcontrast))
   #varlogcontrast<-which(abs(coeflogcontrast)>0)
   varlogcontrast<-which(abs(coeflogcontrast)>coef_threshold)
     coeflogcontrast<-coeflogcontrast[varlogcontrast]
@@ -453,18 +453,22 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
   if (is.null(covar)){
     predictions<-logcontrast
   } else {
-    if (y.binary==TRUE){
-      df1<-data.frame(y_unique,logcontrast, covar)
-      m1<-glm(y_unique~., family = "binomial", data=df1)
-      predictions<-predict(m1)
+    # if (y.binary==TRUE){
+    #   df1<-data.frame(y_unique,logcontrast, covar)
+    #   m1<-glm(y_unique~., family = "binomial", data=df1)
+    #   predictions<-predict(m1)
+    #
+    # } else {
+    #   df1<-data.frame(y_unique,logcontrast, covar)
+    #   m1<-lm(y_unique~., data=df1)
+    #   predictions<-predict(m1)
+    # }
 
-    } else {
-      df1<-data.frame(y_unique,logcontrast, covar)
-      m1<-lm(y_unique~., data=df1)
-      predictions<-predict(m1)
-    }
+    predictions<-x0+logcontrast
 
   }
+
+  coeflogcontrast<-2*coeflogcontrast/sum(abs(coeflogcontrast))
 
   if (y.binary==TRUE){
     AUC_signature<-pROC::auc(pROC::roc(y_unique, as.numeric(predictions),quiet = TRUE))[[1]]
@@ -638,7 +642,7 @@ coda_glmnet_longitudinal0 <- function(x,lrX,idlrX,nameslrX,y, x_time, subject_id
     coeflogcontrast[idlrXsub[i,2]]<-coeflogcontrast[idlrXsub[i,2]]-coeflr[i]
   }
 
-  coeflogcontrast<-2*coeflogcontrast/sum(abs(coeflogcontrast))
+  #coeflogcontrast<-2*coeflogcontrast/sum(abs(coeflogcontrast))
   varlogcontrast<-which(abs(coeflogcontrast)>0)
   coeflogcontrast<-coeflogcontrast[varlogcontrast]
 
@@ -659,18 +663,21 @@ coda_glmnet_longitudinal0 <- function(x,lrX,idlrX,nameslrX,y, x_time, subject_id
   if (is.null(covar)){
     predictions<-logcontrast
   } else {
-    if (y.binary==TRUE){
-      df1<-data.frame(y_unique,logcontrast, covar)
-      m1<-glm(y_unique~., family = "binomial", data=df1)
-      predictions<-predict(m1)
+    # if (y.binary==TRUE){
+    #   df1<-data.frame(y_unique,logcontrast, covar)
+    #   m1<-glm(y_unique~., family = "binomial", data=df1)
+    #   predictions<-predict(m1)
+    #
+    # } else {
+    #   df1<-data.frame(y_unique,logcontrast, covar)
+    #   m1<-lm(y_unique~., data=df1)
+    #   predictions<-predict(m1)
+    # }
 
-    } else {
-      df1<-data.frame(y_unique,logcontrast, covar)
-      m1<-lm(y_unique~., data=df1)
-      predictions<-predict(m1)
-    }
-
+    predictions<-x0+logcontrast
   }
+
+  coeflogcontrast<-2*coeflogcontrast
 
   if (y.binary==TRUE){
     AUC_signature<-pROC::auc(pROC::roc(y_unique, as.numeric(predictions),quiet = TRUE))[[1]]

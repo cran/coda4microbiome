@@ -1,6 +1,6 @@
 Package: coda4microbiome
 Title: Compositional Data Analysis for Microbiome Studies
-Version: 0.1.4
+Version: 0.2.1
 Authors@R: 
 	c(
 	person(
@@ -14,6 +14,12 @@ Authors@R:
 	  email = "toni.susin@upc.edu",
 	  role = c("aut", "cre"),
 	  comment = c(ORCID = "0000-0002-0874-2784")
+	),
+	person(
+	  "Meritxell", "Pujolassos",
+	  email = "meritxell.pujolassos@uvic.cat",
+	  role = c("aut"),
+	  comment = c(ORCID = "0000-0003-0313-3506")
 	)
 	)
 Description: Functions for microbiome data analysis that take into account its compositional nature. Performs variable selection through penalized regression for both, cross-sectional and longitudinal studies, and for binary and continuous outcomes.    
@@ -23,14 +29,15 @@ BugReports: https://github.com/malucalle/coda4microbiome/issues
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 LazyData: false
-Imports: corrplot, glmnet, plyr, pROC, ggpubr, ggplot2
-Suggests: knitr, rmarkdown
-VignetteBuilder: knitr
+Imports: corrplot, glmnet, plyr, pROC, ggpubr, ggplot2, ComplexHeatmap,
+        circlize, survival, survminer
+Suggests: rmarkdown
 NeedsCompilation: no
-Packaged: 2023-02-09 19:03:00 UTC; Toni
+Packaged: 2023-12-11 19:25:16 UTC; Toni
 Author: Malu Calle [aut] (<https://orcid.org/0000-0001-9334-415X>),
-  Toni Susin [aut, cre] (<https://orcid.org/0000-0002-0874-2784>)
+  Toni Susin [aut, cre] (<https://orcid.org/0000-0002-0874-2784>),
+  Meritxell Pujolassos [aut] (<https://orcid.org/0000-0003-0313-3506>)
 Maintainer: Toni Susin <toni.susin@upc.edu>
 Depends: R (>= 3.5.0)
 Repository: CRAN
-Date/Publication: 2023-02-09 19:20:02 UTC
+Date/Publication: 2023-12-21 16:00:08 UTC
