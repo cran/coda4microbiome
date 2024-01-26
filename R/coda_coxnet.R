@@ -279,98 +279,113 @@ plot_survcurves <- function(risk.score, time, status, strata.quantile = 0.5)
 #' #-------------------------------------------------------------------------------
 plot_riskscore <- function(risk.score, x, time, status, showPlots = TRUE)
 {
-#  library(ComplexHeatmap)
-#  library(circlize)
 
   # Set colors:
   c_sign = c("#F8766DFF", "#00BFC4FF")
-  #c_sign = c("deepskyblue3", "coral1")
   c_status = c("gray95", "chocolate1")
   c_time = c("gray80", "chocolate1")
 
   # Arrange features data
-    # Signature
+  # Signature
   signature <- matrix(risk.score, dimnames = list(rownames(x), "signature"))
-    # Status
+  # Status
   if (is.numeric(status)){
-    e <- as.factor(status)
+    e <- factor(status, levels = c(0,1), labels = c("No", "Yes"))
     event <- matrix(e, dimnames = list(rownames(x), "event"))
   }
   if (is.logical(status)){
-    e <- factor(status, levels = c("FALSE", "TRUE"), labels = c("0", "1"))
+    e <- factor(status, levels = c("FALSE", "TRUE"), labels = c("No", "Yes"))
     event <- matrix(e, dimnames = list(rownames(x), "event"))
   }
-    # Time
+  # Time
   eventime <- matrix(time, dimnames = list(rownames(x), "time"))
 
   # Get the right order according to signature value
-  samorder <- rownames(x)[order(signature[,1], decreasing = F)]
+  samorder <- rownames(x)[order(signature[,1], decreasing = T)]
   signature <-signature[samorder,]
   event <- event[samorder,]
   eventime <- eventime[samorder,]
 
   # Heatmaps
-  tsignature <- as.matrix(t(signature))
-  rownames(tsignature) <- "Microbial risk score"
-  hm_sign <- Heatmap(tsignature,
+
+  laby <- rep("", length(signature))
+  laby[1] <- "high risk"
+  laby[length(signature)] <- "low risk"
+
+  ra <- rowAnnotation(siglab = anno_text(laby,
+                                         gp = grid::gpar(fontsize = 10),
+                                         just = "right",
+                                         location = 1))
+
+
+  hm_sign <- Heatmap(as.matrix(signature),
                      name = "Microbial risk score",
-                     # cluster and dendogram
+                     # Cluster and dendogram
                      cluster_rows = F,
                      cluster_columns = F,
                      # Rows arrangements (samples)
-                     #row_order = samorder,
+                     row_title = "Microbial risk score",
                      row_names_side = "left",
                      show_row_dend = FALSE,
-                     show_row_names = TRUE,
+                     show_row_names = FALSE,
+                     left_annotation = ra,
                      # Columns arrangements (signature)
                      column_title_side = "bottom",
-                     show_column_names = FALSE,
+                     column_title_rot = 0,
+                     show_column_names = TRUE,
                      show_column_dend = FALSE,
+
+                     show_heatmap_legend = FALSE,
 
                      col =  colorRamp2(breaks = c(quantile(signature, 0)[[1]],
                                                   quantile(signature, 1)[[1]]),
                                        colors = c_sign),
-                     border = FALSE
-                     #width = unit(1, "cm")
+                     border = FALSE,
+                     width = unit(5, "mm"),
+                     height = unit(50, "mm"),
   )
 
-  tevent <- as.matrix(t(event))
-  rownames(tevent) <- "Status"
-  hm_event <- Heatmap(tevent,
-                      name = "Status",
+  point_time = rowAnnotation(name = "Time",
+                             Time = anno_points(eventime,
+                                                gp = grid::gpar(col = ifelse(event == "Yes", c_time[[2]], c_time[[1]])),
+                                                axis_param = list(labels_rot = 0)),
+                             # Annotation labels
+                             height = unit(5, "cm"),
+                             width = unit(10, "cm"),
+                             annotation_name_rot = 0,
+                             gap = unit(2, "mm"),
+                             border = FALSE
+  )
+
+  hm_event <- Heatmap(as.matrix(event),
+                      name = "Event ocurrence",
                       # cluster and dendogram
                       cluster_rows = F,
                       cluster_columns = F,
                       # Rows arrangements (samples)
-                      ##row_order = samorder,
                       row_names_side = "left",
                       show_row_dend = FALSE,
-                      show_row_names = TRUE,
+                      show_row_names = FALSE,
                       # Columns arrangements (signature)
                       column_title_side = "bottom",
-                      show_column_names = FALSE,
+                      show_column_names = TRUE,
                       show_column_dend = FALSE,
 
-                      col =  c("0" = c_status[[1]], "1" = c_status[[2]]),
-                      border = FALSE
-                      #width = unit(1, "cm")
+                      col =  c("No" = c_status[[1]], "Yes" = c_status[[2]]),
+                      border = FALSE,
+                      width = unit(3, "mm"),
+                      height = unit(50, "mm"),
+
+                      column_title_rot = 0
+
   )
-  point_time = HeatmapAnnotation(name = "Time",
-                                 Time = anno_points(eventime,  #which = "row",
-                                                    gp = grid::gpar(col = ifelse(event == "1", c_time[[2]], c_time[[1]])),
-                                                    axis_param = list(direction = "reverse")),
-                                 # Annotation labels
-                                 height = unit(5, "cm"),
-                                 annotation_name_side = "left",
-                                 annotation_name_rot = 0,
-                                 gap = unit(2, "mm"),
-                                 border = TRUE
-  )
-  ht <- point_time %v% hm_event %v% hm_sign
+
+  ht <- hm_sign + point_time +hm_event
+  ht
+
 
   if (showPlots == TRUE) {
     draw(ht)
   }
   return(ht)
 }
-

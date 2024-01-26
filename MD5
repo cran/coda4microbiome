@@ -1,11 +1,11 @@
-3829954ec78b36b52037ef8ed3b39803 *DESCRIPTION
+786a8d30562b69f33fd0f4452d2111eb *DESCRIPTION
 362fc53b4ef90f30df889a22b651bec1 *LICENSE
 a6f59d240cbeea63d633682884467bd4 *NAMESPACE
 602529dcb932de741c62326147fc46b9 *R/coda4microbiome.R
 d8a1f4705620f2eac817e51deb450c5d *R/coda4microbiome_data.R
 a089e88a19e8bc20d58728abb3506797 *R/coda4microbiome_functions.R
 1cf3a86a958a4f58db91a28720770084 *R/coda4microbiome_longitudinal_functions.R
-d108b07cec1dc1ace7d23fe15e8c5ed8 *R/coda_coxnet.R
+b77aa523109041aa7e94d195328912c1 *R/coda_coxnet.R
 cb4924f3573383fca290a0a8e2ca5294 *build/partial.rdb
 824df1922f574b6cb112621dd6a056d6 *data/Crohn.rda
 db1f20dff474e2914d3b7fbe4d2a702d *data/HIV.rda
