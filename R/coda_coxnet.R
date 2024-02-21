@@ -99,10 +99,8 @@ coda_coxnet <- function (x, time, status, covar = NULL, lambda = "lambda.1se", n
   lrselect <- which(coeflr != 0)
   coeflogcontrast <- rep(0, ncol(x))
   for (i in (1:length(coeflr))) {
-    coeflogcontrast[idlrX[i, 1]] <- coeflogcontrast[idlrX[i,
-                                                          1]] + coeflr[i]
-    coeflogcontrast[idlrX[i, 2]] <- coeflogcontrast[idlrX[i,
-                                                          2]] - coeflr[i]
+    coeflogcontrast[idlrX[i, 1]] <- coeflogcontrast[idlrX[i,1]] + coeflr[i]
+    coeflogcontrast[idlrX[i, 2]] <- coeflogcontrast[idlrX[i,2]] - coeflr[i]
   }
   varlogcontrast <- which(abs(coeflogcontrast) > coef_threshold)
   coeflogcontrast <- coeflogcontrast[varlogcontrast]
@@ -114,9 +112,13 @@ coda_coxnet <- function (x, time, status, covar = NULL, lambda = "lambda.1se", n
   logcontrast = as.matrix(log(x)[, varlogcontrast]) %*% coeflogcontrast # Bacterial signature
 
   if (is.null(covar)) {
-    predictions <- logcontrast
+    #predictions <- logcontrast
+    predictions<-as.numeric(predict(cvfit,lrX,s=lambdavalue))
+
   } else {
-    predictions<-x0+logcontrast
+    #predictions<-x0+logcontrast
+    predictions<-as.numeric(predict(cvfit,lrX,s=lambdavalue, newoffset=x0))
+
   }
 
   coeflogcontrast<-2*coeflogcontrast/sum(abs(coeflogcontrast))
@@ -129,9 +131,20 @@ coda_coxnet <- function (x, time, status, covar = NULL, lambda = "lambda.1se", n
   mcvCindex <- cvfit$cvm[idrow]
   sdcvCindex <- cvfit$cvsd[idrow]
 
-  #plot1 <- plot_prediction(predictions, y, showPlots = showPlots)
-  plot1 <- plot_riskscore(predictions, x, time, status, showPlots = showPlots)
-  plot2 <- plot_signature(names.select, coeflogcontrast, showPlots = showPlots)
+  plot1<-NULL
+  plot2<-NULL
+
+  if (length(lrselect>0)){
+
+    plot1 <- plot_riskscore(predictions, x, time, status, showPlots = showPlots)
+    plot2 <- plot_signature(names.select, coeflogcontrast, showPlots = showPlots)
+
+  } else {
+    print("No variables are selected. The risk score plot and the signature plot are not displayed.")
+  }
+
+
+
 
   #if (y.binary == TRUE) {
   results <- list(taxa.num = varlogcontrast, taxa.name = names.select,

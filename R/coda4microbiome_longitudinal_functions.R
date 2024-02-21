@@ -451,7 +451,9 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
 
 
   if (is.null(covar)){
-    predictions<-logcontrast
+    #predictions<-logcontrast
+    predictions<-as.numeric(predict(lassocv,lrX,s=lambdavalue))
+
   } else {
     # if (y.binary==TRUE){
     #   df1<-data.frame(y_unique,logcontrast, covar)
@@ -464,7 +466,9 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
     #   predictions<-predict(m1)
     # }
 
-    predictions<-x0+logcontrast
+    #predictions<-x0+logcontrast
+    predictions<-as.numeric(predict(lassocv,lrX,s=lambdavalue, newoffset=x0))
+
 
   }
 
@@ -479,14 +483,28 @@ coda_glmnet_longitudinal <- function(x,y, x_time, subject_id, ini_time, end_time
   } else {
     mcvDev<-lassocv$cvm[idrow]
     sdcvDev<-lassocv$cvsd[idrow]
-    Rsq<-as.numeric(cor(predictions,y_unique)^2)
-    if (length(varlogcontrast)==0) Rsq <- 0
+    Rsq <- 0
+    if (length(varlogcontrast)>0){
+      Rsq<-as.numeric(cor(predictions,y)^2)
+    }
   }
 
   y<-y_unique
-  plot1 <- plot_prediction(predictions,y, showPlots = showPlots)
 
-  plot2<-plot_signature(names.select,coeflogcontrast, showPlots = showPlots)
+  plot1<-NULL
+  plot2<-NULL
+
+  if (length(lrselect>0)){
+
+    plot1 <- plot_prediction(predictions,y, showPlots = showPlots)
+
+    plot2<-plot_signature(names.select,coeflogcontrast, showPlots = showPlots)
+
+  } else {
+    print("No variables are selected. The prediction and the signature plots are not displayed.")
+  }
+
+
 
   plot3<-NULL
 
@@ -661,7 +679,9 @@ coda_glmnet_longitudinal0 <- function(x,lrX,idlrX,nameslrX,y, x_time, subject_id
 
 
   if (is.null(covar)){
-    predictions<-logcontrast
+    #predictions<-logcontrast
+    predictions<-as.numeric(predict(lassocv,lrX,s=lambdavalue))
+
   } else {
     # if (y.binary==TRUE){
     #   df1<-data.frame(y_unique,logcontrast, covar)
@@ -674,7 +694,9 @@ coda_glmnet_longitudinal0 <- function(x,lrX,idlrX,nameslrX,y, x_time, subject_id
     #   predictions<-predict(m1)
     # }
 
-    predictions<-x0+logcontrast
+    #predictions<-x0+logcontrast
+    predictions<-as.numeric(predict(lassocv,lrX,s=lambdavalue, newoffset=x0))
+
   }
 
   coeflogcontrast<-2*coeflogcontrast
@@ -688,8 +710,10 @@ coda_glmnet_longitudinal0 <- function(x,lrX,idlrX,nameslrX,y, x_time, subject_id
   } else {
     mcvDev<-lassocv$cvm[idrow]
     sdcvDev<-lassocv$cvsd[idrow]
-    Rsq<-as.numeric(cor(predictions,y_unique)^2)
-    if (length(varlogcontrast)==0) Rsq <- 0
+    Rsq <- 0
+    if (length(varlogcontrast)>0){
+      Rsq<-as.numeric(cor(predictions,y)^2)
+    }
   }
 
   y<-y_unique

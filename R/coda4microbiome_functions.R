@@ -554,7 +554,9 @@ coda_glmnet<-function(x,y, covar=NULL, lambda="lambda.1se",nvar=NULL,alpha=0.9, 
   # logcontrast<-logcontrast-mean(logcontrast)
 
   if (is.null(covar)){
-    predictions<-logcontrast
+    #predictions<-logcontrast
+    predictions<-as.numeric(predict(lassocv,lrX,s=lambdavalue))
+
   } else {
     # if (y.binary==TRUE){
     #   df1<-data.frame(y,logcontrast, covar)
@@ -567,7 +569,9 @@ coda_glmnet<-function(x,y, covar=NULL, lambda="lambda.1se",nvar=NULL,alpha=0.9, 
     #   predictions<-predict(m1)
     # }
 
-    predictions<-x0+logcontrast
+    #predictions<-x0+logcontrast
+    predictions<-as.numeric(predict(lassocv,lrX,s=lambdavalue, newoffset=x0))
+
 
   }
 
@@ -582,14 +586,26 @@ coda_glmnet<-function(x,y, covar=NULL, lambda="lambda.1se",nvar=NULL,alpha=0.9, 
   } else {
     mcvMSE<-lassocv$cvm[idrow]
     sdcvMSE<-lassocv$cvsd[idrow]
-    Rsq<-as.numeric(cor(predictions,y)^2)
-    if (length(varlogcontrast)==0) Rsq <- 0
+    Rsq <- 0
+    if (length(varlogcontrast)>0){
+      Rsq<-as.numeric(cor(predictions,y)^2)
+    }
   }
 
-  plot1 <- plot_prediction(predictions,y,showPlots=showPlots)
+
+  plot1<-NULL
+  plot2<-NULL
+
+  if (length(lrselect>0)){
+    plot1 <- plot_prediction(predictions,y,showPlots=showPlots)
+
+    plot2<-plot_signature(names.select,coeflogcontrast,showPlots=showPlots)
+
+  } else {
+    print("No variables are selected. The prediction and the signature plots are not displayed.")
+  }
 
 
-  plot2<-plot_signature(names.select,coeflogcontrast,showPlots=showPlots)
 
   if (y.binary==TRUE){
     results <- list(
@@ -883,7 +899,9 @@ coda_glmnet0<-function(x,lrX,idlrX,nameslrX,y, covar=NULL, lambda="lambda.1se",a
   # logcontrast<-logcontrast-mean(logcontrast)
 
   if (is.null(covar)){
-    predictions<-logcontrast
+    #predictions<-logcontrast
+    predictions<-as.numeric(predict(lassocv,lrX,s=lambdavalue))
+
   } else {
     # if (y.binary==TRUE){
     #   df1<-data.frame(y,logcontrast, covar)
@@ -896,7 +914,9 @@ coda_glmnet0<-function(x,lrX,idlrX,nameslrX,y, covar=NULL, lambda="lambda.1se",a
     #   predictions<-predict(m1)
     # }
 
-    predictions<-x0+logcontrast
+    #predictions<-x0+logcontrast
+    predictions<-as.numeric(predict(lassocv,lrX,s=lambdavalue, newoffset=x0))
+
 
   }
 
@@ -911,8 +931,10 @@ coda_glmnet0<-function(x,lrX,idlrX,nameslrX,y, covar=NULL, lambda="lambda.1se",a
   } else {
     mcvMSE<-lassocv$cvm[idrow]
     sdcvMSE<-lassocv$cvsd[idrow]
-    Rsq<-as.numeric(cor(predictions,y)^2)
-    if (length(varlogcontrast)==0) Rsq <- 0
+    Rsq <- 0
+    if (length(varlogcontrast)>0){
+      Rsq<-as.numeric(cor(predictions,y)^2)
+    }
   }
 
   if (y.binary==TRUE){

@@ -1,6 +1,6 @@
 Package: coda4microbiome
 Title: Compositional Data Analysis for Microbiome Studies
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: 
 	c(
 	person(
@@ -33,11 +33,11 @@ Imports: corrplot, glmnet, plyr, pROC, ggpubr, ggplot2, ComplexHeatmap,
         circlize, survival, survminer
 Suggests: rmarkdown
 NeedsCompilation: no
-Packaged: 2024-01-26 14:34:54 UTC; Toni
+Packaged: 2024-02-21 07:38:03 UTC; Toni
 Author: Malu Calle [aut] (<https://orcid.org/0000-0001-9334-415X>),
   Toni Susin [aut, cre] (<https://orcid.org/0000-0002-0874-2784>),
   Meritxell Pujolassos [aut] (<https://orcid.org/0000-0003-0313-3506>)
 Maintainer: Toni Susin <toni.susin@upc.edu>
 Depends: R (>= 3.5.0)
 Repository: CRAN
-Date/Publication: 2024-01-26 15:40:02 UTC
+Date/Publication: 2024-02-21 08:30:06 UTC
