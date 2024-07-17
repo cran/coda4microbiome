@@ -671,6 +671,7 @@ plot_prediction <- function(prediction, y, strata=NULL, showPlots=TRUE){
   y.binary<-ifelse(dim(table(y))==2, TRUE, FALSE)
 
  # if (y.binary == TRUE) {y<-factor(y)}
+  if(is.character(y)) {y <- factor(y)} ## Convert to factor if y is a character   #version 0.2.4
 
   if (is.null(strata)){
     data <- data.frame(prediction,y)
